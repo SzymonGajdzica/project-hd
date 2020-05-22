@@ -3,24 +3,26 @@ package pl.polsl.data.source
 import pl.polsl.data.model.Data
 import pl.polsl.data.model.Page
 import pl.polsl.main.Main
+import pl.polsl.main.mRemove
 import java.util.*
 
 class DataSource(private val dataSourceInfo: DataSourceInfo) {
 
     private val pageSize = Main.pageSize
     private val pages = arrayListOf<Page>()
-    private var pendingDataList = LinkedList<Data>()
+    private val pendingDataList = LinkedList<Data>()
     private var lastFetchTime = System.currentTimeMillis()
 
     init {
         Thread {
             while (System.currentTimeMillis() - lastFetchTime < dataSourceInfo.maxTimeOfInactivity) {
-                pendingDataList.add(Data(Date(), Random().nextDouble(), 0))
-                if (pendingDataList.size == pageSize) {
-                    synchronized(this) {
-                        pages.add(Page(pendingDataList))
+                repeat(dataSourceInfo.numberOfProducers) {
+                    pendingDataList.add(Data(Date(), Random().nextDouble(), it))
+                }
+                synchronized(this) {
+                    while (pendingDataList.size >= pageSize) {
+                        pages.add(Page(pendingDataList.mRemove(pageSize)))
                     }
-                    pendingDataList = LinkedList<Data>()
                 }
                 Thread.sleep(dataSourceInfo.produceTimeRange.random())
             }
@@ -28,10 +30,10 @@ class DataSource(private val dataSourceInfo: DataSourceInfo) {
     }
 
     fun fetchData(startTime: Date, numberOfPages: Int): List<Data>? {
-        if (numberOfPages <= 0)
-            return emptyList()
         Thread.sleep(dataSourceInfo.connectionTimeRange.random() + (numberOfPages * dataSourceInfo.singleDataLoadRange.random()))
         lastFetchTime = System.currentTimeMillis()
+        if (numberOfPages <= 0)
+            return emptyList()
         synchronized(this) {
             val startIndex = pages.indexOfFirst { it.date > startTime }
             if (startIndex == -1)

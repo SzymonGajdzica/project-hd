@@ -5,5 +5,5 @@ import java.util.*
 data class Data(
         val date: Date,
         val measurement: Double,
-        val measurementType: Int
+        val stationId: Int
 )

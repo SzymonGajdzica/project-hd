@@ -5,17 +5,17 @@ class SampleLoadStrategy : LoadStrategy() {
     private var pagesToLoad = 1
 
     override fun getNumberOfPages(remainingElements: Int): Int {
-        return if (remainingElements < pageSize * 2) pagesToLoad else 0
+        return if (remainingElements < pageSize * pagesToLoad) pagesToLoad else 0
     }
 
     override fun getInitialNumberOfPages(): Int {
-        return 5
+        return pagesToLoad * 2
     }
 
-    override fun analyzeData(waitTime: Long, bufferSize: Int) {
-        super.analyzeData(waitTime, bufferSize)
+    override fun analyzeData(waitTime: Long, bufferSize: Int, loadedPages: Int) {
+        super.analyzeData(waitTime, bufferSize, loadedPages)
         if(waitTime != 0L)
-            pagesToLoad += 5
+            pagesToLoad += 1
     }
 
 }

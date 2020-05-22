@@ -1,13 +1,16 @@
 package pl.polsl.data.manager
 
 import pl.polsl.data.source.DataSource
-import pl.polsl.strategy.SampleLoadStrategy
+import pl.polsl.strategy.LoadStrategy
 import java.util.*
 
-class Connector(private val dataSource: DataSource) {
+class Connector(
+        private val dataSource: DataSource,
+        private val loadStrategy: LoadStrategy
+) {
 
     fun connect(startDate: Date): DataManager {
-        return DataManager(dataSource, SampleLoadStrategy(), startDate)
+        return DataManager(dataSource, loadStrategy, startDate)
     }
 
 }
