@@ -24,15 +24,15 @@ object Main {
                 singleDataLoadRange = 10L..20L
         )
         val userSourceInfo = UserSimulatorInfo(
-                fetchedElementsByUserRange = 1000..2000,
-                maxNumberOfUsers = 1,
+                fetchedElementsByUserRange = 100..200,
+                maxNumberOfUsers = 10,
                 userSpawnTimeRange = 0L..100L,
                 userAskDelayRange = 10L..20L
         )
 
         val dataSource = DataSource(dataSourceInfo)
-        val loadStrategy = TriggerLoadStrategy()
-        val connector = Connector(dataSource, loadStrategy)
+        val loadStrategyCreator =  { TriggerLoadStrategy() }
+        val connector = Connector(dataSource, loadStrategyCreator)
         val userSimulator = UserSimulator(connector, userSourceInfo)
         userSimulator.startSimulation()
     }
