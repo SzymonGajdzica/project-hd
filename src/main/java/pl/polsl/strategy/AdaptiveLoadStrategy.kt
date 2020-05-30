@@ -16,6 +16,7 @@ class AdaptiveLoadStrategy : LoadStrategy() {
         super.analyzeData(loadData)
         if(loadData.waitTime != 0L)
             pagesToLoad += 1
+        //TODO improve algorithm
     }
 
 }

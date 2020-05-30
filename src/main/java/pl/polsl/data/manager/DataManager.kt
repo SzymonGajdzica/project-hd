@@ -72,11 +72,8 @@ class DataManager(
                     dataSet.addAll(data)
                 } else
                     println("Buffer overload, not adding data to dataSet! Try to configure loadStrategy to prevent it")
-            } else {
-                loadStrategy.notEnoughDataAvailable(numberOfPagesToLoad)
-                isLoadingData = false
-                loadMoreData(loadStrategy.getNumberOfPages(dataSet.size))
-            }
+            } else
+                println("Data source do not have enough data! This scenario not implemented")
             isLoadingData = false
         }.start()
     }

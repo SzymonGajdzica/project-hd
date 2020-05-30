@@ -21,12 +21,15 @@ abstract class LoadStrategy {
 
     }
 
-    open fun notEnoughDataAvailable(numberOfRequestedPages: Int) {
-
-    }
-
     fun getLScore(): Double {
-        return (10000L - ((loadDataList.map { it.waitTime }.max() ?: 0L) * 100) - ((loadDataList.map { it.initialBufferSize }.max()?.toLong() ?: 0L))).toDouble()
+        val maxWaitTime = loadDataList.map { it.waitTime }.max()?.toDouble() ?: 0.0
+        val averageWaitTime = loadDataList.map { it.waitTime }.average()
+        val numberOfDelays = loadDataList.map { it.waitTime }.filter { it != 0L }.count().toDouble()
+        val maxBufferSize = loadDataList.map { it.initialBufferSize }.max()?.toDouble() ?: 0.0
+        val averageBufferSize = loadDataList.map { it.initialBufferSize }.average()
+        val numberOfConnections = loadDataList.map { it.loadedPages }.filter { it != 0 }.count().toDouble()
+        //TODO mix variables
+        return maxWaitTime
     }
 
     fun getLoadData(): List<LoadData> {
