@@ -14,7 +14,7 @@ class UserSimulator(
         while (numberOfUsers < userSimulatorInfo.maxNumberOfUsers) {
             Thread.sleep(userSimulatorInfo.userSpawnTimeRange.random())
             numberOfUsers++
-            createNewUserThread()
+            createNewUserThread(numberOfUsers)
         }
     }
 
@@ -22,18 +22,21 @@ class UserSimulator(
         userCreatorThread.start()
     }
 
-    private fun createNewUserThread() {
+    private fun createNewUserThread(id: Int) {
         Thread {
             val dataManager = connector.connect(Date().apply { time -= 5000L })
             dataManager.initialize()
             val maxNumberOfElements = userSimulatorInfo.fetchedElementsByUserRange.random()
+            val staticWaitTime = userSimulatorInfo.userStaticAskDelayRange.random()
             var numberOfElements = 0
             while (numberOfElements < maxNumberOfElements) {
-                Thread.sleep(userSimulatorInfo.userAskDelayRange.random())
-                dataManager.next
+                Thread.sleep(staticWaitTime + userSimulatorInfo.userDynamicAskDelayRange.random())
+                dataManager.next.apply {
+                    //display data
+                }
                 numberOfElements++
             }
-            dataManager.finish()
+            dataManager.finish(id, staticWaitTime)
         }.start()
     }
 

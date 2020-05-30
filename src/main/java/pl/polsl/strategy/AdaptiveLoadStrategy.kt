@@ -1,6 +1,6 @@
 package pl.polsl.strategy
 
-class SampleLoadStrategy : LoadStrategy() {
+class AdaptiveLoadStrategy : LoadStrategy() {
 
     private var pagesToLoad = 1
 
@@ -12,9 +12,9 @@ class SampleLoadStrategy : LoadStrategy() {
         return pagesToLoad * 2
     }
 
-    override fun analyzeData(waitTime: Long, bufferSize: Int, loadedPages: Int) {
-        super.analyzeData(waitTime, bufferSize, loadedPages)
-        if(waitTime != 0L)
+    override fun analyzeData(loadData: LoadData) {
+        super.analyzeData(loadData)
+        if(loadData.waitTime != 0L)
             pagesToLoad += 1
     }
 

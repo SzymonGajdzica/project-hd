@@ -6,11 +6,11 @@ import java.util.*
 
 class Connector(
         private val dataSource: DataSource,
-        private val loadStrategyCreator: () -> LoadStrategy
+        private val loadStrategyType: LoadStrategy.Type
 ) {
 
     fun connect(startDate: Date): DataManager {
-        return DataManager(dataSource, loadStrategyCreator(), startDate)
+        return DataManager(dataSource, LoadStrategy.getLoadStrategy(loadStrategyType), startDate)
     }
 
 }

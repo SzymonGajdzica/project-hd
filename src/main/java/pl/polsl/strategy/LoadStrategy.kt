@@ -1,38 +1,49 @@
 package pl.polsl.strategy
 
 import pl.polsl.main.Main
-import pl.polsl.main.format
 import java.util.*
 
 abstract class LoadStrategy {
 
     protected val maxBufferSize = Main.maxBufferSize
     protected val pageSize = Main.pageSize
-    protected val waitTimes = LinkedList<Long>()
-    protected val bufferSizes = LinkedList<Int>()
-    protected val loadedPagesList = LinkedList<Int>()
+    private val loadDataList = LinkedList<LoadData>()
 
     abstract fun getNumberOfPages(remainingElements: Int): Int
 
     abstract fun getInitialNumberOfPages(): Int
 
-    open fun analyzeData(waitTime: Long, bufferSize: Int, loadedPages: Int) {
-        bufferSizes.add(bufferSize)
-        waitTimes.add(waitTime)
-        loadedPagesList.add(loadedPages)
+    open fun analyzeData(loadData: LoadData) {
+        loadDataList.add(loadData)
     }
 
-    open fun analyzeInitialData(waitTime: Long, loadedPages: Int) {
+    open fun analyzeInitialData(loadData: LoadData) {
 
     }
 
-    open fun generateReport(): String {
-        return buildString {
-            append("| <Name> | <max value> | <min value> | <average value> | <sum value> |\n")
-            append("Wait time | ${waitTimes.max()} | - | ${waitTimes.average().format()} | ${waitTimes.sum()} |\n")
-            append("Buffer size | ${bufferSizes.max()} | ${bufferSizes.min()} | ${bufferSizes.average().format()} | - |\n")
-            append("Loaded pages | ${loadedPagesList.max()} | - | - | ${loadedPagesList.sum()} |\n")
+    open fun notEnoughDataAvailable(numberOfRequestedPages: Int) {
+
+    }
+
+    fun getLoadData(): List<LoadData> {
+        return loadDataList
+    }
+
+    enum class Type {
+        RENEW, SPARE, TRIGGER, ADAPTIVE
+    }
+
+    companion object {
+
+        fun getLoadStrategy(type: Type): LoadStrategy {
+            return when(type) {
+                Type.RENEW -> RenewLoadStrategy()
+                Type.SPARE -> SpareLoadStrategy()
+                Type.TRIGGER -> TriggerLoadStrategy()
+                Type.ADAPTIVE -> AdaptiveLoadStrategy()
+            }
         }
+
     }
 
 }

@@ -15,7 +15,7 @@ class DataSource(private val dataSourceInfo: DataSourceInfo) {
 
     init {
         Thread {
-            while (System.currentTimeMillis() - lastFetchTime < dataSourceInfo.maxTimeOfInactivity) {
+            while (System.currentTimeMillis() - lastFetchTime < 1000) {
                 repeat(dataSourceInfo.numberOfProducers) {
                     pendingDataList.add(Data(Date(), Random().nextDouble(), it))
                 }
@@ -33,13 +33,13 @@ class DataSource(private val dataSourceInfo: DataSourceInfo) {
         Thread.sleep(dataSourceInfo.connectionTimeRange.random() + (numberOfPages * dataSourceInfo.singleDataLoadRange.random()))
         lastFetchTime = System.currentTimeMillis()
         if (numberOfPages <= 0)
-            return emptyList()
+            throw IllegalArgumentException("numberOfPages must be greater than 0")
         synchronized(this) {
             val startIndex = pages.indexOfFirst { it.date > startTime }
-            if (startIndex == -1)
-                return null
             val endIndex = startIndex + numberOfPages
-            return pages.subList(startIndex, if (endIndex < pages.size) endIndex else pages.size - 1).flatMap { it.dataList }.map { it.copy() }
+            if (startIndex == -1 || endIndex >= pages.size)
+                return null
+            return pages.subList(startIndex, endIndex).flatMap { it.dataList }.map { it.copy() }
         }
     }
 

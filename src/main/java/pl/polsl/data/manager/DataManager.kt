@@ -2,8 +2,10 @@ package pl.polsl.data.manager
 
 import pl.polsl.data.model.Data
 import pl.polsl.data.source.DataSource
+import pl.polsl.main.Logger
 import pl.polsl.main.Main
 import pl.polsl.main.waitTill
+import pl.polsl.strategy.LoadData
 import pl.polsl.strategy.LoadStrategy
 import java.util.*
 import java.util.concurrent.LinkedBlockingDeque
@@ -22,11 +24,19 @@ class DataManager(
         val numberOfPages = loadStrategy.getInitialNumberOfPages()
         loadMoreData(numberOfPages)
         val waitTime = waitTill { hasNext }
-        loadStrategy.analyzeInitialData(waitTime, numberOfPages)
+        loadStrategy.analyzeInitialData(LoadData(
+                date = Date(),
+                waitTime = waitTime,
+                initialBufferSize = 0,
+                bufferSize = dataSet.size,
+                loadedPages = numberOfPages,
+                initialIsLoadingData = false,
+                isLoadingData = false
+        ))
     }
 
-    fun finish() {
-        print(loadStrategy.generateReport())
+    fun finish(userId: Int, staticWaitTime: Long) {
+        Logger.instance.log(Logger.LogData(userId, staticWaitTime, loadStrategy.getLoadData()))
     }
 
     val hasNext: Boolean
@@ -34,32 +44,38 @@ class DataManager(
 
     val next: Data
         get() {
-            val numberOfPagesToLoad = loadStrategy.getNumberOfPages(dataSet.size)
-            loadMoreData(numberOfPagesToLoad)
+            val numberOfPages = if (!isLoadingData) loadStrategy.getNumberOfPages(dataSet.size) else 0
+            val wasLoadingData = isLoadingData
+            val initialBufferSize = dataSet.size
+            if (numberOfPages > 0)
+                loadMoreData(numberOfPages)
             val waitTime = waitTill { hasNext }
-            loadStrategy.analyzeData(waitTime, dataSet.size, numberOfPagesToLoad)
-            //println(dataSet.size)
+            loadStrategy.analyzeData(LoadData(
+                    date = Date(),
+                    waitTime = waitTime,
+                    loadedPages = numberOfPages,
+                    initialBufferSize = initialBufferSize,
+                    bufferSize = dataSet.size - 1,
+                    initialIsLoadingData = wasLoadingData,
+                    isLoadingData = isLoadingData
+            ))
             return dataSet.poll()
         }
 
     private fun loadMoreData(numberOfPagesToLoad: Int) {
-        if (isLoadingData || numberOfPagesToLoad <= 0)
-            return
-        //println("starting load of $numberOfPagesToLoad pages")
         isLoadingData = true
         Thread {
             val data = dataSource.fetchData(currentDate, numberOfPagesToLoad)
             if (data != null) {
-                //println("loaded ${data.size / Main.pageSize} pages")
                 if (dataSet.size + data.size <= maxBufferSize) {
+                    currentDate = data.last().date
                     dataSet.addAll(data)
-                    if (dataSet.isNotEmpty())
-                        currentDate = dataSet.last.date
                 } else
-                    println("Buffer overload, not adding data to dataSet")
-
+                    println("Buffer overload, not adding data to dataSet! Try to configure loadStrategy to prevent it")
             } else {
-                println("No data found for this date")
+                loadStrategy.notEnoughDataAvailable(numberOfPagesToLoad)
+                isLoadingData = false
+                loadMoreData(loadStrategy.getNumberOfPages(dataSet.size))
             }
             isLoadingData = false
         }.start()
