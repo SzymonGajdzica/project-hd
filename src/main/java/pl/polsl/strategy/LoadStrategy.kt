@@ -25,6 +25,10 @@ abstract class LoadStrategy {
 
     }
 
+    fun getLScore(): Double {
+        return (10000L - ((loadDataList.map { it.waitTime }.max() ?: 0L) * 100) - ((loadDataList.map { it.initialBufferSize }.max()?.toLong() ?: 0L))).toDouble()
+    }
+
     fun getLoadData(): List<LoadData> {
         return loadDataList
     }

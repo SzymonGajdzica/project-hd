@@ -36,7 +36,7 @@ class DataManager(
     }
 
     fun finish(userId: Int, staticWaitTime: Long) {
-        Logger.instance.log(Logger.LogData(userId, staticWaitTime, loadStrategy.getLoadData()))
+        Logger.instance.log(Logger.LogData(userId, staticWaitTime, loadStrategy.getLScore(), loadStrategy.getLoadData()))
     }
 
     val hasNext: Boolean

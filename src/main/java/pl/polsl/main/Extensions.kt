@@ -2,9 +2,7 @@ package pl.polsl.main
 
 import java.util.*
 
-fun Double.format(precision: Int = 2): String {
-    return String.format("%1$,.${precision}f", this).replace(",", ".")
-}
+fun Double.format(decimals: Int = 2): String = "%.${decimals}f".format(this).replace(",", ".")
 
 fun<T> LinkedList<T>.mRemove(numberOfElements: Int): List<T> {
     val list = LinkedList<T>()

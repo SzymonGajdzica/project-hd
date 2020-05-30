@@ -23,11 +23,11 @@ object Main {
                 singleDataLoadRange = 15L..20L
         )
         val userSourceInfo = UserSimulatorInfo(
-                fetchedElementsByUserRange = 100..200,
+                fetchedElementsByUserRange = 10..1000,
                 maxNumberOfUsers = 100,
                 userSpawnTimeRange = 1L..100L,
-                userStaticAskDelayRange = 5L..40L,
-                userDynamicAskDelayRange = 0L..20L
+                userStaticAskDelayRange = 5L..50L,
+                userDynamicAskDelayRange = 0L..10L
         )
         val dataSource = DataSource(dataSourceInfo)
         val loadStrategyType = LoadStrategy.Type.ADAPTIVE
