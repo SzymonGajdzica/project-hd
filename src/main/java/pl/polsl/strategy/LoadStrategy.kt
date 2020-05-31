@@ -22,14 +22,10 @@ abstract class LoadStrategy {
     }
 
     fun getLScore(): Double {
-        val maxWaitTime = loadDataList.map { it.waitTime }.max()?.toDouble() ?: 0.0
+        val timeFactor = 2.0
         val averageWaitTime = loadDataList.map { it.waitTime }.average()
-        val numberOfDelays = loadDataList.map { it.waitTime }.filter { it != 0L }.count().toDouble()
-        val maxBufferSize = loadDataList.map { it.initialBufferSize }.max()?.toDouble() ?: 0.0
         val averageBufferSize = loadDataList.map { it.initialBufferSize }.average()
-        val numberOfConnections = loadDataList.map { it.loadedPages }.filter { it != 0 }.count().toDouble()
-        //TODO mix variables
-        return maxWaitTime
+        return ((maxBufferSize - averageBufferSize) / maxBufferSize) / ((averageWaitTime * timeFactor) + 1.0)
     }
 
     fun getLoadData(): List<LoadData> {

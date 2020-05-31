@@ -24,13 +24,13 @@ object Main {
         )
         val userSourceInfo = UserSimulatorInfo(
                 fetchedElementsByUserRange = 10..1000,
-                maxNumberOfUsers = 100,
-                userSpawnTimeRange = 1L..100L,
+                maxNumberOfUsers = 1000,
+                userSpawnTimeRange = 1L..10L,
                 userStaticAskDelayRange = 5L..50L,
                 userDynamicAskDelayRange = 0L..10L
         )
         val dataSource = DataSource(dataSourceInfo)
-        val loadStrategyType = LoadStrategy.Type.ADAPTIVE
+        val loadStrategyType = LoadStrategy.Type.SPARE
         val connector = Connector(dataSource, loadStrategyType)
         val userSimulator = UserSimulator(connector, userSourceInfo)
         Logger.initialize(userSourceInfo, dataSourceInfo, LoadStrategy.getLoadStrategy(loadStrategyType).javaClass.simpleName)
