@@ -2,6 +2,7 @@ package pl.polsl.main
 
 import pl.polsl.data.source.DataSourceInfo
 import pl.polsl.strategy.LoadData
+import pl.polsl.strategy.LoadStats
 import pl.polsl.user.UserSimulatorInfo
 import java.io.File
 import java.io.FileWriter
@@ -29,8 +30,7 @@ class Logger(
     data class LogData(
             val userId: Int,
             val staticWaitTime: Long,
-            val lScore: Double,
-            val loadDataList: List<LoadData>
+            val loadStats: LoadStats
     )
 
     @Synchronized
@@ -50,22 +50,23 @@ class Logger(
             append("maxBufferSize=$maxBufferSize)\n")
             append("$dataSourceInfo\n")
             append("$userSimulatorInfo\n")
-            logDataList.map { it.lScore }.also { lScores ->
+            logDataList.map { it.loadStats.lScore }.also { lScores ->
                 append("LScore(")
                 append("Max=${lScores.max()}, ")
                 append("Min=${lScores.min()}, ")
                 append("Average=${lScores.average()})\n")
             }
-            append(getLoadDataStats(logDataList.flatMap { it.loadDataList }))
+            append(getLoadDataStats(logDataList.flatMap { it.loadStats.loadDataList }))
             append("\n")
             append("--------DetailedData--------\n\n")
-            logDataList.sortedBy { it.lScore }.forEach { logData ->
+            logDataList.sortedBy { it.loadStats.lScore }.forEach { logData ->
                 append("Info(")
                 append("userId=${logData.userId}, ")
                 append("staticWaitTime=${logData.staticWaitTime}, ")
-                append("requestedElements=${logData.loadDataList.size})\n")
-                append("LScore(${logData.lScore})\n")
-                append(getLoadDataStats(logData.loadDataList))
+                append("requestedElements=${logData.loadStats.loadDataList.size})\n")
+                append("LScore(${logData.loadStats.lScore})\n")
+                append(getLoadDataStats(logData.loadStats.loadDataList))
+                append("AdditionalInfo(${logData.loadStats.logMessage})\n\n")
             }
         }
     }
@@ -90,7 +91,7 @@ class Logger(
                 append("Max=${loadedPagesList.max()}, ")
                 append("NonZeroCount=${loadedPagesList.filter{ it != 0 }.count()}, ")
                 append("NonZeroAverage=${loadedPagesList.filter{ it != 0 }.average()}, ")
-                append("Sum=${loadedPagesList.sum()})\n\n")
+                append("Sum=${loadedPagesList.sum()})\n")
             }
         }
     }

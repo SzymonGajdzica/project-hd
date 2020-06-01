@@ -17,33 +17,32 @@ abstract class LoadStrategy {
         loadDataList.add(loadData)
     }
 
-    open fun analyzeInitialData(loadData: LoadData) {
+    protected open val logMessage: String? = null
 
-    }
+    private val lScore: Double
+        get() {
+            val timeFactor = 100.0
+            val averageWaitTime = loadDataList.map { it.waitTime }.average()
+            val averageBufferSize = loadDataList.map { it.bufferSize }.average()
+            return ((maxBufferSize - averageBufferSize) / maxBufferSize) / ((averageWaitTime * timeFactor) + 1.0)
+        }
 
-    fun getLScore(): Double {
-        val timeFactor = 2.0
-        val averageWaitTime = loadDataList.map { it.waitTime }.average()
-        val averageBufferSize = loadDataList.map { it.initialBufferSize }.average()
-        return ((maxBufferSize - averageBufferSize) / maxBufferSize) / ((averageWaitTime * timeFactor) + 1.0)
-    }
-
-    fun getLoadData(): List<LoadData> {
-        return loadDataList
-    }
+    val loadStats: LoadStats
+        get() = LoadStats(lScore, loadDataList, logMessage)
 
     enum class Type {
-        RENEW, SPARE, TRIGGER, ADAPTIVE
+        RENEW, SPARE, TRIGGER, ADAPTIVE, TEST
     }
 
     companion object {
 
         fun getLoadStrategy(type: Type): LoadStrategy {
-            return when(type) {
+            return when (type) {
                 Type.RENEW -> RenewLoadStrategy()
                 Type.SPARE -> SpareLoadStrategy()
                 Type.TRIGGER -> TriggerLoadStrategy()
                 Type.ADAPTIVE -> AdaptiveLoadStrategy()
+                Type.TEST -> TestLoadStrategy()
             }
         }
 

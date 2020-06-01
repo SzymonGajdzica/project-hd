@@ -21,22 +21,12 @@ class DataManager(
     private var isLoadingData = false
 
     fun initialize() {
-        val numberOfPages = loadStrategy.getInitialNumberOfPages()
-        loadMoreData(numberOfPages)
-        val waitTime = waitTill { hasNext }
-        loadStrategy.analyzeInitialData(LoadData(
-                date = Date(),
-                waitTime = waitTime,
-                initialBufferSize = 0,
-                bufferSize = dataSet.size,
-                loadedPages = numberOfPages,
-                initialIsLoadingData = false,
-                isLoadingData = false
-        ))
+        loadMoreData(loadStrategy.getInitialNumberOfPages())
+        waitTill { hasNext }
     }
 
     fun finish(userId: Int, staticWaitTime: Long) {
-        Logger.instance.log(Logger.LogData(userId, staticWaitTime, loadStrategy.getLScore(), loadStrategy.getLoadData()))
+        Logger.instance.log(Logger.LogData(userId, staticWaitTime, loadStrategy.loadStats))
     }
 
     val hasNext: Boolean
