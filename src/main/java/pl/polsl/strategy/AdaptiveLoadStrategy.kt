@@ -1,6 +1,7 @@
 package pl.polsl.strategy
 
 import kotlin.math.min
+import kotlin.math.roundToInt
 
 class AdaptiveLoadStrategy: LoadStrategy() {
 
@@ -8,17 +9,17 @@ class AdaptiveLoadStrategy: LoadStrategy() {
         COLLECTING_STATS, WORKING
     }
 
-    private val maxCyclesWithoutChange = 10
-
     private var state = State.COLLECTING_STATS
     private var pagesToLoad = 1
 
     private var cyclesWithoutChangeCounter = 0
-    private var lastLowestSize = -1
+    private var lastLoadedPages = 0
     private var lowestSize = maxBufferSize
 
+    private val maxCyclesWithoutChange: Int
+        get() = ((maxBufferSize / pageSize).toDouble() / pagesToLoad.toDouble()).roundToInt()
     private val loadMargin: Int
-        get() = (pagesToLoad * pageSize * 0.1).toInt()
+        get() = (pagesToLoad * pageSize * 0.1).roundToInt()
     private val standardLoadBorder: Int
         get() = maxBufferSize - (pageSize * pagesToLoad)
     private val adaptedLoadBorder: Int by lazy {
@@ -26,18 +27,18 @@ class AdaptiveLoadStrategy: LoadStrategy() {
     }
 
     override fun getNumberOfPages(remainingElements: Int): Int {
-        return when(state) {
-            State.COLLECTING_STATS -> if(remainingElements <= standardLoadBorder) pagesToLoad else 0
-            State.WORKING -> if(remainingElements <= adaptedLoadBorder) pagesToLoad else 0
+        return when (state) {
+            State.COLLECTING_STATS -> if (remainingElements <= standardLoadBorder) pagesToLoad else 0
+            State.WORKING -> if (remainingElements <= adaptedLoadBorder) pagesToLoad else 0
         }
     }
-
-    override val logMessage: String?
-        get() = "adaptedLoadBorder=${adaptedLoadBorder}, pagesToLoad=$pagesToLoad, state=$state"
 
     override fun getInitialNumberOfPages(): Int {
         return maxBufferSize / pageSize
     }
+
+    override val logMessage: String?
+        get() = "adaptedLoadBorder=$adaptedLoadBorder, pagesToLoad=$pagesToLoad, state=$state"
 
     override fun analyzeData(loadData: LoadData) {
         super.analyzeData(loadData)
@@ -45,24 +46,26 @@ class AdaptiveLoadStrategy: LoadStrategy() {
             lowestSize = min(loadData.initialBufferSize, lowestSize)
             if (lowestSize < maxBufferSize - (2 * pagesToLoad * pageSize)) {
                 pagesToLoad++
-                if(pagesToLoad >= maxBufferSize / pageSize / 2) {
-                    lowestSize = (maxBufferSize / 2) - loadMargin
+                if (pagesToLoad >= maxBufferSize / pageSize / 2) {
+                    lowestSize = maxBufferSize
                     state = State.WORKING
                 } else {
                     lowestSize = maxBufferSize
-                    lastLowestSize = -1
-                    cyclesWithoutChangeCounter = 0
-                }
-            } else if (loadData.loadedPages != 0) {
-                if (lastLowestSize == lowestSize)
-                    cyclesWithoutChangeCounter++
-                else {
-                    lastLowestSize = lowestSize
+                    lastLoadedPages = 0
                     cyclesWithoutChangeCounter = 0
                 }
             }
-            if (cyclesWithoutChangeCounter >= maxCyclesWithoutChange)
+            if (loadData.loadedPages != 0) {
+                if (lastLoadedPages == loadData.loadedPages) {
+                    cyclesWithoutChangeCounter++
+                } else {
+                    lastLoadedPages = loadData.loadedPages
+                    cyclesWithoutChangeCounter = 0
+                }
+            }
+            if (cyclesWithoutChangeCounter >= maxCyclesWithoutChange) {
                 state = State.WORKING
+            }
         }
     }
 

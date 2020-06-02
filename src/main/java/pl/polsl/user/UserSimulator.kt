@@ -24,7 +24,7 @@ class UserSimulator(
 
     private fun createNewUserThread(id: Int) {
         Thread {
-            val dataManager = connector.connect(Date().apply { time -= 5000L })
+            val dataManager = connector.connect(Date().apply { time -= 10000L })
             dataManager.initialize()
             val maxNumberOfElements = userSimulatorInfo.fetchedElementsByUserRange.random()
             val staticWaitTime = userSimulatorInfo.userStaticAskDelayRange.random()

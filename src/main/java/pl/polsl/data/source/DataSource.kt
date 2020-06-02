@@ -30,7 +30,11 @@ class DataSource(private val dataSourceInfo: DataSourceInfo) {
     }
 
     fun fetchData(startTime: Date, numberOfPages: Int): List<Data>? {
-        Thread.sleep(dataSourceInfo.connectionTimeRange.random() + (numberOfPages * dataSourceInfo.singleDataLoadRange.random()))
+        var waitTime =  dataSourceInfo.connectionTimeRange.random()
+        repeat(numberOfPages * pageSize) {
+            waitTime += dataSourceInfo.singleDataLoadRange.random()
+        }
+        Thread.sleep(waitTime)
         lastFetchTime = System.currentTimeMillis()
         if (numberOfPages <= 0)
             throw IllegalArgumentException("numberOfPages must be greater than 0")

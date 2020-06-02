@@ -9,7 +9,7 @@ import pl.polsl.user.UserSimulatorInfo
 
 object Main {
 
-    var maxBufferSize = 100
+    var maxBufferSize = 200
         private set
     var pageSize = 10
         private set
@@ -17,17 +17,17 @@ object Main {
     @JvmStatic
     fun main(args: Array<String>) {
         val dataSourceInfo = DataSourceInfo(
-                numberOfProducers = 4,
+                numberOfProducers = 20,
                 produceTimeRange = 2L..4L,
-                connectionTimeRange = 100L..120L,
-                singleDataLoadRange = 15L..20L
+                connectionTimeRange = 1000L..2000L,
+                singleDataLoadRange = 1L..2L
         )
         val userSourceInfo = UserSimulatorInfo(
-                fetchedElementsByUserRange = 500..1000,
+                fetchedElementsByUserRange = 1000..2000,
                 maxNumberOfUsers = 1000,
                 userSpawnTimeRange = 1L..10L,
-                userStaticAskDelayRange = 5L..50L,
-                userDynamicAskDelayRange = 0L..10L
+                userStaticAskDelayRange = 5L..30L,
+                userDynamicAskDelayRange = 5L..50L
         )
         val dataSource = DataSource(dataSourceInfo)
         val loadStrategyType = LoadStrategy.Type.ADAPTIVE
