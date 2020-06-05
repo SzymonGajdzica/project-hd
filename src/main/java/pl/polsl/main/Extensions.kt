@@ -2,6 +2,8 @@ package pl.polsl.main
 
 import java.util.*
 
+fun Double.asPercent(decimals: Int = 2): String = (this * 100.0).format(decimals) + "%"
+
 fun Double.format(decimals: Int = 2): String = "%.${decimals}f".format(this).replace(",", ".")
 
 fun<T> LinkedList<T>.mRemove(numberOfElements: Int): List<T> {

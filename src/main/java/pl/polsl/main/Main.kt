@@ -9,7 +9,7 @@ import pl.polsl.user.UserSimulatorInfo
 
 object Main {
 
-    var maxBufferSize = 200
+    var maxBufferSize = 500
         private set
     var pageSize = 10
         private set
@@ -18,19 +18,19 @@ object Main {
     fun main(args: Array<String>) {
         val dataSourceInfo = DataSourceInfo(
                 numberOfProducers = 20,
-                produceTimeRange = 2L..4L,
-                connectionTimeRange = 1000L..2000L,
+                produceTimeRange = 1L..2L,
+                connectionTimeRange = 500L..1000L,
                 singleDataLoadRange = 1L..2L
         )
         val userSourceInfo = UserSimulatorInfo(
-                fetchedElementsByUserRange = 1000..2000,
+                fetchedElementsByUserRange = 200..300,
                 maxNumberOfUsers = 1000,
-                userSpawnTimeRange = 1L..10L,
-                userStaticAskDelayRange = 5L..30L,
-                userDynamicAskDelayRange = 5L..50L
+                userSpawnTimeRange = 1L..2L,
+                userStaticAskDelayRange = 0L..0L,
+                userDynamicAskDelayRange = 1L..10L
         )
         val dataSource = DataSource(dataSourceInfo)
-        val loadStrategyType = LoadStrategy.Type.ADAPTIVE
+        val loadStrategyType = LoadStrategy.Type.ADAPTIVE_RENEW
         val connector = Connector(dataSource, loadStrategyType)
         val userSimulator = UserSimulator(connector, userSourceInfo)
         Logger.initialize(userSourceInfo, dataSourceInfo, LoadStrategy.getLoadStrategy(loadStrategyType).javaClass.simpleName)

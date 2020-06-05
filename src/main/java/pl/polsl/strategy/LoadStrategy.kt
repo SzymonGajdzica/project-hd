@@ -21,17 +21,24 @@ abstract class LoadStrategy {
 
     private val lScore: Double
         get() {
-            val timeFactor = 100.0
-            val averageWaitTime = loadDataList.map { it.waitTime }.average()
-            val averageBufferSize = loadDataList.map { it.bufferSize }.average()
-            return ((maxBufferSize - averageBufferSize) / maxBufferSize) / ((averageWaitTime * timeFactor) + 1.0)
+            val timeWeight = 4.0
+            val sizeWeight = 1.0
+            val timeFactor = loadDataList.map { it.waitTime }.let { waitTimes ->
+                1.0 / ((waitTimes.sum().toDouble() / 100.0) + 1.0)
+            }
+            val sizeFactor = loadDataList.map { it.bufferSize }.let { bufferSizes ->
+                val maxBufferSize = maxBufferSize.toDouble()
+                val averageBufferSize = bufferSizes.average()
+                (maxBufferSize - averageBufferSize) / maxBufferSize
+            }
+            return ((sizeFactor * sizeWeight) + (timeFactor * timeWeight)) / (timeWeight + sizeWeight)
         }
 
     val loadStats: LoadStats
         get() = LoadStats(lScore, loadDataList, logMessage)
 
     enum class Type {
-        RENEW, SPARE, TRIGGER, ADAPTIVE, TEST
+        RENEW, SPARE, TRIGGER, ADAPTIVE_RENEW, ADAPTIVE_SPARE, FULL_RENEW
     }
 
     companion object {
@@ -41,8 +48,9 @@ abstract class LoadStrategy {
                 Type.RENEW -> RenewLoadStrategy()
                 Type.SPARE -> SpareLoadStrategy()
                 Type.TRIGGER -> TriggerLoadStrategy()
-                Type.ADAPTIVE -> AdaptiveLoadStrategy()
-                Type.TEST -> TestLoadStrategy()
+                Type.ADAPTIVE_RENEW -> AdaptiveRenewLoadStrategy()
+                Type.ADAPTIVE_SPARE -> AdaptiveSpareLoadStrategy()
+                Type.FULL_RENEW -> FullRenewLoadStrategy()
             }
         }
 

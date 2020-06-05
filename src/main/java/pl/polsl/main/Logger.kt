@@ -52,9 +52,9 @@ class Logger(
             append("$userSimulatorInfo\n")
             logDataList.map { it.loadStats.lScore }.also { lScores ->
                 append("LScore(")
-                append("Max=${lScores.max()}, ")
-                append("Min=${lScores.min()}, ")
-                append("Average=${lScores.average()})\n")
+                append("Max=${lScores.max()?.asPercent()}, ")
+                append("Min=${lScores.min()?.asPercent()}, ")
+                append("Average=${lScores.average().asPercent()})\n")
             }
             append(getLoadDataStats(logDataList.flatMap { it.loadStats.loadDataList }))
             append("\n")
@@ -64,7 +64,7 @@ class Logger(
                 append("userId=${logData.userId}, ")
                 append("staticWaitTime=${logData.staticWaitTime}, ")
                 append("requestedElements=${logData.loadStats.loadDataList.size})\n")
-                append("LScore(${logData.loadStats.lScore})\n")
+                append("LScore(${logData.loadStats.lScore.asPercent()})\n")
                 append(getLoadDataStats(logData.loadStats.loadDataList))
                 append("AdditionalInfo(${logData.loadStats.logMessage})\n\n")
             }
@@ -76,7 +76,7 @@ class Logger(
             loadDataList.map { it.waitTime }.also { waitTimes ->
                 append("WaitTime(")
                 append("Max=${waitTimes.max()}, ")
-                append("Average=${waitTimes.average()}, ")
+                append("Average=${waitTimes.average().format()}, ")
                 append("NonZeroCount=${waitTimes.filter{ it != 0L }.count()}, ")
                 append("Sum=${waitTimes.sum()})\n")
             }
@@ -84,13 +84,13 @@ class Logger(
                 append("BufferSize(")
                 append("Max=${bufferSizes.max()}, ")
                 append("Min=${bufferSizes.min()}, ")
-                append("Average=${bufferSizes.average()})\n")
+                append("Average=${bufferSizes.average().format()})\n")
             }
             loadDataList.map { it.loadedPages }.also { loadedPagesList ->
                 append("LoadedPages(")
                 append("Max=${loadedPagesList.max()}, ")
                 append("NonZeroCount=${loadedPagesList.filter{ it != 0 }.count()}, ")
-                append("NonZeroAverage=${loadedPagesList.filter{ it != 0 }.average()}, ")
+                append("NonZeroAverage=${loadedPagesList.filter{ it != 0 }.average().format()}, ")
                 append("Sum=${loadedPagesList.sum()})\n")
             }
         }

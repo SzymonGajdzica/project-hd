@@ -2,7 +2,7 @@ package pl.polsl.strategy
 
 import kotlin.math.min
 
-class TestLoadStrategy : LoadStrategy() {
+class AdaptiveSpareLoadStrategy : LoadStrategy() {
 
     private var pagesToLoad = 1
 
