@@ -4,5 +4,5 @@ data class DataSourceInfo(
         val produceTimeRange: LongRange,
         val numberOfProducers: Int,
         val connectionTimeRange: LongRange,
-        val singleDataLoadRange: LongRange
+        val singlePageLoadRange: LongRange
 )

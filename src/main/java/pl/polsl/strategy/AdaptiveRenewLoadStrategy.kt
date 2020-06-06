@@ -6,7 +6,7 @@ import kotlin.math.roundToInt
 class AdaptiveRenewLoadStrategy: LoadStrategy() {
 
     private enum class State {
-        COLLECTING_STATS, WORKING, FULL_RENEW
+        COLLECTING_STATS, WORKING, FULL
     }
 
     private var state = State.COLLECTING_STATS
@@ -30,7 +30,7 @@ class AdaptiveRenewLoadStrategy: LoadStrategy() {
         return when (state) {
             State.COLLECTING_STATS -> if (remainingElements <= standardLoadBorder) pagesToLoad else 0
             State.WORKING -> if (remainingElements <= adaptedLoadBorder) pagesToLoad else 0
-            State.FULL_RENEW -> if(remainingElements <= maxBufferSize / pageSize / 2) maxBufferSize / pageSize / 2 else 0
+            State.FULL -> if(remainingElements <= maxBufferSize / pageSize / 2) maxBufferSize / pageSize / 2 else 0
         }
     }
 
@@ -48,7 +48,7 @@ class AdaptiveRenewLoadStrategy: LoadStrategy() {
             if (lowestSize < maxBufferSize - (2 * pagesToLoad * pageSize)) {
                 pagesToLoad++
                 if (pagesToLoad >= maxBufferSize / pageSize / 2) {
-                    state = State.FULL_RENEW
+                    state = State.FULL
                 } else {
                     lowestSize = maxBufferSize
                     lastLoadedPages = 0

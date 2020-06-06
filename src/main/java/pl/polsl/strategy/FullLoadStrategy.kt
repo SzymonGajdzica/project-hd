@@ -1,6 +1,6 @@
 package pl.polsl.strategy
 
-class FullRenewLoadStrategy: LoadStrategy() {
+class FullLoadStrategy: LoadStrategy() {
 
     private val pagesToLoad = maxBufferSize / pageSize / 2
 

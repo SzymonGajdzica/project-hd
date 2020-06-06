@@ -7,7 +7,7 @@ class AdaptiveSpareLoadStrategy : LoadStrategy() {
     private var pagesToLoad = 1
 
     override fun getNumberOfPages(remainingElements: Int): Int {
-        return if (remainingElements < pageSize * pagesToLoad) pagesToLoad else 0
+        return if (remainingElements <= pageSize * pagesToLoad) pagesToLoad else 0
     }
 
     override fun getInitialNumberOfPages(): Int {

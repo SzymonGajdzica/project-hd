@@ -30,9 +30,9 @@ class DataSource(private val dataSourceInfo: DataSourceInfo) {
     }
 
     fun fetchData(startTime: Date, numberOfPages: Int): List<Data>? {
-        var waitTime =  dataSourceInfo.connectionTimeRange.random()
-        repeat(numberOfPages * pageSize) {
-            waitTime += dataSourceInfo.singleDataLoadRange.random()
+        var waitTime = dataSourceInfo.connectionTimeRange.random()
+        repeat(numberOfPages) {
+            waitTime += dataSourceInfo.singlePageLoadRange.random()
         }
         Thread.sleep(waitTime)
         lastFetchTime = System.currentTimeMillis()

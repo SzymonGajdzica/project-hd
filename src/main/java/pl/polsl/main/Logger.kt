@@ -23,6 +23,7 @@ class Logger(
         }
     }
 
+    private val startDate = Date()
     private val pageSize = Main.pageSize
     private val maxBufferSize = Main.maxBufferSize
     private val logDataList = LinkedList<LogData>()
@@ -44,7 +45,8 @@ class Logger(
         return buildString {
             append("--------General data--------\n\n")
             append("Info(")
-            append("date=${Date()}, ")
+            append("startDate=$startDate, ")
+            append("endDate=${Date()}, ")
             append("strategyType=$loadStrategyName, ")
             append("pageSize=$pageSize, ")
             append("maxBufferSize=$maxBufferSize)\n")
