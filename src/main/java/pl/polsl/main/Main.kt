@@ -9,7 +9,7 @@ import pl.polsl.user.UserSimulatorInfo
 
 object Main {
 
-    var maxBufferSize = 500
+    var maxBufferSize = 200
         private set
     var pageSize = 10
         private set
@@ -19,15 +19,15 @@ object Main {
         val dataSourceInfo = DataSourceInfo(
                 numberOfProducers = 20,
                 produceTimeRange = 1L..2L,
-                connectionTimeRange = 200L..400L,
-                singlePageLoadRange = 10L..300L
+                connectionTimeRange = 100L..125L,
+                singlePageLoadRange = 5L..10L
         )
         val userSourceInfo = UserSimulatorInfo(
-                fetchedElementsByUserRange = 4000..5000,
+                fetchedElementsByUserRange = 2000..3000,
                 maxNumberOfUsers = 1000,
                 userSpawnTimeRange = 1L..2L,
-                userStaticAskDelayRange = 1L..10L,
-                userDynamicAskDelayRange = 2L..50L
+                userStaticAskDelayRange = 2L..4L,
+                userDynamicAskDelayRange = 1L..20L
         )
         val dataSource = DataSource(dataSourceInfo)
         val loadStrategyType = LoadStrategy.Type.ADAPTIVE_RENEW
